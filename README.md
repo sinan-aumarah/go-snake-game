@@ -2,7 +2,7 @@
 
 Simple Terminal-based Snake game written using golang and gdamore/tcell.
 
-<img src="https://i.imgur.com/ZX6Bqlg.gif" width="40%">
+<img src="https://i.imgur.com/QTNmrFA.gif" width="40%">
 
 
 ## Play
