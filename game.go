@@ -74,7 +74,7 @@ func randomFoodPosition(a *stage, x int, y int) coord {
 }
 
 func canEatFood(a *stage, c coord) bool {
-	return c.isOnAnother(a.food.coord)
+	return c.samePositionAs(a.food.coord)
 }
 
 func (a *stage) isOccupied(c coord) bool {

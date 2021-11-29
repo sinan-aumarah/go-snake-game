@@ -11,7 +11,8 @@ const (
 	defaultColor = tcell.ColorDefault
 	bgColor      = tcell.ColorDefault
 	snakeColor   = tcell.ColorLightGreen
-	fullBlock    = '█'
+	foodColor    = tcell.ColorTomato
+	fullBlock    = '■'
 )
 
 type screenDimensions struct {
@@ -47,7 +48,7 @@ func renderSnake(sc tcell.Screen, left, bottom int, s *snake) {
 }
 
 func renderFood(screen tcell.Screen, left, bottom int, f *food) {
-	screen.SetCell(left+f.coord.x, bottom-f.coord.y, tcell.StyleDefault.Foreground(tcell.ColorTomato), fullBlock)
+	screen.SetCell(left+f.coord.x, bottom-f.coord.y, fgStyle(foodColor), fullBlock)
 }
 
 func renderArena(screen tcell.Screen, a *stage, d screenDimensions) {
@@ -56,15 +57,19 @@ func renderArena(screen tcell.Screen, a *stage, d screenDimensions) {
 		screen.SetContent(d.left+a.width, i, '│', nil, defaultStyle())
 	}
 
-	renderContentRecursively(screen, d.left, d.top, a.width, a.height+1, '│', fgStyle(tcell.ColorGrey))
-
 	screen.SetContent(d.left-1, d.top, '┌', nil, defaultStyle())
 	screen.SetContent(d.left-1, d.bottom, '└', nil, defaultStyle())
 	screen.SetContent(d.left+a.width, d.top, '┐', nil, defaultStyle())
 	screen.SetContent(d.left+a.width, d.bottom, '┘', nil, defaultStyle())
 
+	renderGrid(screen, a, d)
+
 	renderContentRecursively(screen, d.left, d.top, a.width, 1, '─', defaultStyle())
 	renderContentRecursively(screen, d.left, d.bottom, a.width, 1, '─', defaultStyle())
+}
+
+func renderGrid(screen tcell.Screen, a *stage, d screenDimensions) {
+	renderContentRecursively(screen, d.left, d.top, a.width, a.height+1, '│', fgStyle(tcell.ColorDimGray))
 }
 
 func defaultStyle() tcell.Style {
@@ -83,14 +88,14 @@ func style(fg, bg tcell.Color) tcell.Style {
 
 func renderPoints(screen tcell.Screen, d screenDimensions, s int) {
 	pointsStr := fmt.Sprintf("Points: %v", s)
-	printMsg(screen, d.right+2, d.top+2, fgStyle(tcell.ColorGreenYellow), pointsStr)
+	renderStr(screen, d.right+2, d.top+2, fgStyle(tcell.ColorGreenYellow), pointsStr)
 }
 
 func renderInstructions(screen tcell.Screen, d screenDimensions) {
 	msgs := []string{"Key bindings:", "ENTER : new game", "ESC : quit"}
 
 	for i, msg := range msgs {
-		printMsg(screen, d.right+2, d.midY+i, fgStyle(tcell.ColorDimGrey), msg)
+		renderStr(screen, d.right+2, d.midY+i, fgStyle(tcell.ColorDimGrey), msg)
 	}
 }
 
@@ -102,7 +107,7 @@ func renderContentRecursively(screen tcell.Screen, x, y, w, h int, cell rune, st
 	}
 }
 
-func printMsg(screen tcell.Screen, x, y int, style tcell.Style, str string) {
+func renderStr(screen tcell.Screen, x, y int, style tcell.Style, str string) {
 	for _, c := range str {
 		var comb []rune
 		w := runewidth.RuneWidth(c)
